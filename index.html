@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -13,6 +15,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
     <style>
         :root {
             --pink: #ff7eb9;
@@ -22,34 +27,34 @@
             --gradient: linear-gradient(135deg, #ff7eb9 0%, #764ba2 100%);
         }
 
-        body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; color: var(--dark); margin: 0; padding: 15px; padding-top: 60px; /* Espace pour le bouton retour */ }
+        body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; color: var(--dark); margin: 0; padding: 15px; padding-top: 60px; }
         
-        /* Bouton Retour */
-        .btn-back {
-            position: fixed; top: 15px; left: 15px; z-index: 10000; 
-            background: rgba(255,255,255,0.8); color: var(--purple); 
-            padding: 8px 15px; border-radius: 20px; text-decoration: none; 
-            font-size: 0.8rem; font-weight: 600; backdrop-filter: blur(5px); 
-            border: 1px solid #ddd; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
         .container { max-width: 500px; margin: 0 auto; }
-        .hero-mini { background: var(--gradient); color: white; padding: 20px; text-align: center; border-radius: 20px; margin-bottom: 20px; }
-        .hero-mini h1 { margin: 0; font-size: 1.4rem; }
+        .hero-mini { background: var(--gradient); color: white; padding: 20px; text-align: center; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(118, 75, 162, 0.2); }
+        .hero-mini h1 { margin: 0; font-size: 1.4rem; letter-spacing: 1px; }
         .sync-badge { font-size: 0.7rem; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; display: inline-block; margin-top: 5px; }
+        
         .card { background: var(--white); border-radius: 20px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px; }
         label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--purple); margin-bottom: 5px; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 12px; box-sizing: border-box; font-family: inherit; margin-bottom: 15px; font-size: 1rem; }
-        button { width: 100%; padding: 15px; border: none; border-radius: 12px; background: var(--gradient); color: white; font-weight: bold; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 15px rgba(255, 126, 185, 0.3); }
+        input, select { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 12px; box-sizing: border-box; font-family: inherit; margin-bottom: 15px; font-size: 1rem; outline: none; }
+        input:focus { border-color: var(--pink); }
+        
+        button { width: 100%; padding: 15px; border: none; border-radius: 12px; background: var(--gradient); color: white; font-weight: bold; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 15px rgba(255, 126, 185, 0.3); transition: 0.2s; }
+        button:active { transform: scale(0.97); }
+        
+        .btn-pdf { background: var(--dark); margin-top: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 10px; }
+
         .expense-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f9f9f9; }
-        .expense-info b { display: block; color: var(--dark); }
+        .expense-info b { display: block; color: var(--dark); font-size: 0.95rem; }
         .expense-info small { color: #a2a2a2; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; font-size: 0.65rem; }
         .amt { font-weight: 700; color: var(--purple); }
-        .delete-btn { color: #ff7675; margin-left: 15px; cursor: pointer; opacity: 0.6; }
-        .total-box { text-align: center; padding: 20px; background: #fff5f9; border-radius: 15px; margin: 15px 0; }
-        .total-box div { font-size: 1.5rem; font-weight: 800; color: var(--pink); }
+        .delete-btn { color: #ff7675; margin-left: 15px; cursor: pointer; opacity: 0.5; transition: 0.2s; }
+        .delete-btn:hover { opacity: 1; }
+
+        .total-box { text-align: center; padding: 20px; background: #fff5f9; border-radius: 15px; margin: 15px 0; border: 1px dashed var(--pink); }
+        .total-box div { font-size: 1.6rem; font-weight: 800; color: var(--pink); }
         .debt-card { background: #f1f2f6; padding: 15px; border-radius: 15px; }
-        .debt-line { display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 0.9rem; }
+        .debt-line { display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 0.85rem; }
         .debt-line i { color: var(--pink); }
     </style>
 </head>
@@ -58,7 +63,7 @@
 <div class="container">
     <div class="hero-mini">
         <h1>💰 LA CAISSE</h1>
-        <span class="sync-badge"><i class="fas fa-sync-alt fa-spin"></i> Synchronisation en direct</span>
+        <span class="sync-badge"><i class="fas fa-sync-alt fa-spin"></i> Synchronisation Live</span>
     </div>
 
     <div class="card">
@@ -83,72 +88,62 @@
     </div>
 
     <div class="card">
-        <h2 style="font-size: 1rem; margin-top:0;">DÉPENSES PARTAGÉES</h2>
-        <div id="expenseList"><small>Chargement des données...</small></div>
+        <h2 style="font-size: 1rem; margin-top:0; color: var(--purple);">DÉPENSES PARTAGÉES</h2>
+        <div id="expenseList"><small>Chargement...</small></div>
 
         <div class="total-box">
-            <small>TOTAL DÉPENSÉ</small>
+            <small style="color: var(--purple); font-weight: 600;">TOTAL DÉPENSÉ</small>
             <div id="totalDisplay">0.00 €</div>
-            <small id="shareDisplay">Soit 0.00 € / pers.</small>
+            <small id="shareDisplay" style="color: var(--dark); opacity: 0.7;">Soit 0.00 € / pers.</small>
         </div>
 
         <div id="summaryDisplay" class="debt-card">
-            Les calculs s'afficheront ici.
+            Calcul des remboursements...
         </div>
+
+        <button onclick="generateBeautifulPDF()" class="btn-pdf">
+            <i class="fas fa-file-pdf"></i> RÉCAPITULATIF PDF
+        </button>
     </div>
 </div>
 
 <script type="module">
-    // Importation des fonctions Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
 
-    // Ta configuration récupérée
     const firebaseConfig = {
-        apiKey: "AIzaSyAFLWY9tfylYTPoe0-s2OgjD_5I5sDW5os",
-        authDomain: "comptesnalya.firebaseapp.com",
-        databaseURL: "https://comptesnalya-default-rtdb.firebaseio.com",
-        projectId: "comptesnalya",
-        storageBucket: "comptesnalya.firebasestorage.app",
-        messagingSenderId: "135143379852",
-        appId: "1:135143379852:web:2ae4d250cc973ed9207ca9"
+        apiKey: "AIzaSyB3PuuQfEdAkmecq0JYs1yMqDV78HJdnuM",
+        authDomain: "comptes-18-ans-nalya.firebaseapp.com",
+        databaseURL: "https://comptes-18-ans-nalya-default-rtdb.firebaseio.com",
+        projectId: "comptes-18-ans-nalya",
+        storageBucket: "comptes-18-ans-nalya.firebasestorage.app",
+        messagingSenderId: "265217873923",
+        appId: "1:265217873923:web:524cb1f9d0bd3f1fbe5636"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const expenseRef = ref(db, 'expenses');
 
-    // Fonction pour ajouter (disponible globalement)
+    let rawData = null;
+    let computedDebts = [];
+
     window.addExpense = function() {
         const desc = document.getElementById('desc').value;
         const amount = parseFloat(document.getElementById('amount').value);
         const payer = document.getElementById('payer').value;
-
         if (desc && !isNaN(amount)) {
-            push(expenseRef, {
-                desc: desc,
-                amount: amount,
-                payer: payer,
-                timestamp: Date.now()
-            });
+            push(expenseRef, { desc, amount, payer, timestamp: Date.now() });
             document.getElementById('desc').value = '';
             document.getElementById('amount').value = '';
-        } else {
-            alert("Remplis bien tous les champs !");
         }
     };
 
-    // Fonction pour supprimer
-    window.deleteExpense = function(id) {
-        if(confirm("Supprimer cette dépense ?")) {
-            remove(ref(db, 'expenses/' + id));
-        }
-    };
+    window.deleteExpense = (id) => confirm("Supprimer ?") && remove(ref(db, 'expenses/' + id));
 
-    // Lecture en temps réel
-    onValue(expenseRef, (snapshot) => {
-        const data = snapshot.val();
-        render(data);
+    onValue(expenseRef, (s) => {
+        rawData = s.val();
+        render(rawData);
     });
 
     function render(data) {
@@ -156,9 +151,10 @@
         list.innerHTML = '';
         let total = 0;
         let balances = { "Antonin": 0, "Ethan": 0, "Lise": 0 };
+        computedDebts = [];
 
         if (!data) {
-            list.innerHTML = "<p style='text-align:center; color:#ccc;'>Aucune dépense pour le moment.</p>";
+            list.innerHTML = "<p style='text-align:center; padding:10px; color:#ccc;'>Aucune dépense.</p>";
             document.getElementById('totalDisplay').innerText = "0.00 €";
             document.getElementById('summaryDisplay').innerHTML = "Rien à rembourser.";
             return;
@@ -168,61 +164,122 @@
             const e = data[id];
             total += e.amount;
             balances[e.payer] += e.amount;
-            
-            list.innerHTML += `
-                <div class="expense-item">
-                    <div class="expense-info">
-                        <b>${e.desc}</b>
-                        <small>${e.payer}</small>
-                    </div>
-                    <div>
-                        <span class="amt">${e.amount.toFixed(2)}€</span>
-                        <i class="fas fa-trash delete-btn" onclick="deleteExpense('${id}')"></i>
-                    </div>
-                </div>
-            `;
+            list.innerHTML += `<div class="expense-item"><div class="expense-info"><b>${e.desc}</b><small>${e.payer}</small></div><div><span class="amt">${e.amount.toFixed(2)}€</span><i class="fas fa-trash delete-btn" onclick="deleteExpense('${id}')"></i></div></div>`;
         });
 
         const share = total / 3;
         document.getElementById('totalDisplay').innerText = total.toFixed(2) + " €";
-        document.getElementById('shareDisplay').innerText = "Soit " + share.toFixed(2) + " € par personne";
+        document.getElementById('shareDisplay').innerText = `Soit ${share.toFixed(2)} € par personne`;
 
-        // Calcul des dettes (Qui doit quoi)
-        let debts = [];
-        let members = ["Antonin", "Ethan", "Lise"];
-        let status = members.map(name => ({
-            name: name,
-            balance: balances[name] - share
-        }));
-
-        // Algorithme simplifié de remboursement
+        let status = ["Antonin", "Ethan", "Lise"].map(n => ({ name: n, balance: balances[n] - share }));
         let sorted = status.sort((a, b) => a.balance - b.balance);
-        let i = 0;
-        let j = sorted.length - 1;
-
-        let debtHTML = "";
+        let i = 0, j = sorted.length - 1;
+        let html = "";
         while (i < j) {
-            let payeur = sorted[i];
-            let receveur = sorted[j];
-            let montant = Math.min(-payeur.balance, receveur.balance);
-
-            if (montant > 0.01) {
-                debtHTML += `
-                    <div class="debt-line">
-                        <i class="fas fa-hand-holding-usd"></i>
-                        <span><b>${payeur.name}</b> doit <b>${montant.toFixed(2)}€</b> à ${receveur.name}</span>
-                    </div>`;
+            let m = Math.min(-sorted[i].balance, sorted[j].balance);
+            if (m > 0.01) {
+                computedDebts.push({ from: sorted[i].name, to: sorted[j].name, amount: m });
+                html += `<div class="debt-line"><i class="fas fa-arrow-right"></i><span><b>${sorted[i].name}</b> doit <b>${m.toFixed(2)}€</b> à ${sorted[j].name}</span></div>`;
             }
+            sorted[i].balance += m; sorted[j].balance -= m;
+            if (Math.abs(sorted[i].balance) < 0.01) i++;
+            if (Math.abs(sorted[j].balance) < 0.01) j--;
+        }
+        document.getElementById('summaryDisplay').innerHTML = html || "Tout est équilibré !";
+    }
 
-            payeur.balance += montant;
-            receveur.balance -= montant;
+    // FONCTION PDF AMÉLIORÉE
+    window.generateBeautifulPDF = function() {
+        if (!rawData) return alert("Pas de données !");
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Couleurs du style
+        const C_PINK = [255, 126, 185];
+        const C_PURPLE = [118, 75, 162];
+        const C_DARK = [45, 52, 54];
 
-            if (payeur.balance === 0) i++;
-            if (receveur.balance === 0) j--;
+        // Header avec fond dégradé (simulé par rectangle)
+        doc.setFillColor(C_PURPLE[0], C_PURPLE[1], C_PURPLE[2]);
+        doc.rect(0, 0, 210, 40, 'F');
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(22);
+        doc.text("LA CAISSE - RÉCAPITULATIF", 105, 25, { align: "center" });
+
+        // Date
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Document édité le ${new Date().toLocaleDateString('fr-FR')}`, 105, 32, { align: "center" });
+
+        // Tableau des dépenses
+        const rows = Object.values(rawData).map(e => [e.desc, e.payer, `${e.amount.toFixed(2)} €`]);
+        doc.autoTable({
+            startY: 50,
+            head: [['Description', 'Payeur', 'Montant']],
+            body: rows,
+            headStyles: { fillColor: C_PINK, textColor: 255, fontStyle: 'bold' },
+            alternateRowStyles: { fillColor: [250, 250, 250] },
+            margin: { left: 15, right: 15 }
+        });
+
+        const finalY = doc.lastAutoTable.finalY + 15;
+
+        // Box de résumé (Total)
+        doc.setDrawColor(C_PINK[0], C_PINK[1], C_PINK[2]);
+        doc.setLineWidth(0.5);
+        doc.roundedRect(15, finalY, 180, 25, 3, 3, 'D');
+        
+        doc.setTextColor(C_DARK[0], C_DARK[1], C_DARK[2]);
+        doc.setFontSize(11);
+        doc.text("TOTAL DÉPENSES COLLECTIVES :", 20, finalY + 10);
+        doc.setFontSize(16);
+        doc.setTextColor(C_PINK[0], C_PINK[1], C_PINK[2]);
+        const totalSum = Object.values(rawData).reduce((acc, curr) => acc + curr.amount, 0);
+        doc.text(`${totalSum.toFixed(2)} €`, 20, finalY + 18);
+        
+        doc.setFontSize(11);
+        doc.setTextColor(C_DARK[0], C_DARK[1], C_DARK[2]);
+        doc.text(`Soit ${(totalSum/3).toFixed(2)} € / personne`, 190, finalY + 15, { align: "right" });
+
+        // Remboursements
+        doc.setTextColor(C_PURPLE[0], C_PURPLE[1], C_PURPLE[2]);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.text("RÈGLEMENT DES COMPTES", 15, finalY + 40);
+        
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(C_DARK[0], C_DARK[1], C_DARK[2]);
+        doc.setFontSize(12);
+        
+        let debtY = finalY + 50;
+        if (computedDebts.length === 0) {
+            doc.text("Tout le monde est à jour, aucun remboursement nécessaire !", 15, debtY);
+        } else {
+            computedDebts.forEach(d => {
+                doc.setFont("helvetica", "bold");
+                doc.text(d.from, 15, debtY);
+                doc.setFont("helvetica", "normal");
+                doc.text(` doit `, 15 + doc.getTextWidth(d.from), debtY);
+                doc.setFont("helvetica", "bold");
+                const currentX = 15 + doc.getTextWidth(d.from + " doit ");
+                doc.setTextColor(C_PINK[0], C_PINK[1], C_PINK[2]);
+                doc.text(`${d.amount.toFixed(2)} €`, currentX, debtY);
+                doc.setTextColor(C_DARK[0], C_DARK[1], C_DARK[2]);
+                doc.setFont("helvetica", "normal");
+                doc.text(` à ${d.to}`, currentX + doc.getTextWidth(`${d.amount.toFixed(2)} €`), debtY);
+                debtY += 8;
+            });
         }
 
-        document.getElementById('summaryDisplay').innerHTML = debtHTML || "Tout est équilibré !";
-    }
+        // Footer
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text("Application La Caisse - 18 ans Nalya", 105, 285, { align: "center" });
+
+        doc.save("Recapitulatif-LaCaisse.pdf");
+    };
 </script>
 
 </body>
